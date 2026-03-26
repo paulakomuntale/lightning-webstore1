@@ -40,11 +40,27 @@
         "description": "Help fund future Bitcoin bootcamps in Africa",
         "price": 10000,
         "emoji": "&#10084;"
-    },{
-    "id": "Bedsheet",
-    "name": "Premium Bedsheet",
-    "description": "best for sleeping",
-    "price": 50000,
-    "emoji": "&#128640;"
-}
+    },
+    {
+        "id": "Bedsheet",
+        "name": "Premium Bedsheet",
+        "description": "best for sleeping",
+        "price": 50000,
+        "emoji": "&#128640;"
+    },  
+    {
+        "id": "gadget",
+        "name": "Premium Gadget",
+        "description": "best for using",
+        "price": 50000,
+        "emoji": "&#128640;"
+    },
+    {
+        "id": "coffee",
+        "name": "Lightning Coffee",
+        "description": "best for drinking",
+        "price": 50000,
+        "emoji": "&#128640;"
+    }
+
 ]
