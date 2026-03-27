@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>📋 My Loans</h2>
+
+{% if loans %}
+    {% for loan in loans %}
+    <div style="border: 1px solid #ddd; border-radius: 12px; padding: 20px; margin-bottom: 15px; background: #fff;">
+        <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap;">
+            <div>
+                <h3 style="margin: 0 0 10px 0;">Loan #{{ loan.id }}</h3>
+                <p><strong>Purpose:</strong> {{ loan.purpose }}</p>
+                <p><strong>Amount:</strong> {{ "{:,}".format(loan.amount_sats) }} sats</p>
+                <p><strong>Interest:</strong> {{ "{:,}".format(loan.interest_sats) }} sats ({{ loan.interest_rate }}%)</p>
+                <p><strong>Total to Repay:</strong> {{ "{:,}".format(loan.total_payable_sats) }} sats</p>
+                <p><strong>Status:</strong> 
+                    {% if loan.status == 'pending' %}
+                        <span style="color: orange;">⏳ Pending Funding</span>
+                    {% elif loan.status == 'funded' %}
+                        <span style="color: green;">✅ Funded - Ready to use</span>
+                    {% elif loan.status == 'active' %}
+                        <span style="color: #f39c12;">🔄 Active - Repayment in progress</span>
+                    {% elif loan.status == 'repaid' %}
+                        <span style="color: blue;">🎉 Fully Repaid</span>
+                    {% elif loan.status == 'overdue' %}
+                        <span style="color: red;">⚠️ Overdue - Please repay</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div style="text-align: right;">
+                {% if loan.status in ['funded', 'active', 'overdue'] %}
+                    <a href="/repay/{{ loan.id }}" class="btn" style="background: #27ae60; display: inline-block; padding: 10px 20px;">💰 Make Repayment</a>
+                {% elif loan.status == 'pending' %}
+                    <a href="/fund_loan/{{ loan.id }}" class="btn" style="background: #f39c12; display: inline-block; padding: 10px 20px;">📥 Receive Funds</a>
+                {% endif %}
+                <br>
+                <a href="/loan/{{ loan.id }}" class="btn" style="background: #95a5a6; margin-top: 10px; display: inline-block; padding: 8px 15px;">View Details</a>
+            </div>
+        </div>
+        
+        <!-- Progress Bar for Active Loans -->
+        {% if loan.status in ['funded', 'active'] %}
+        <div style="margin-top: 15px;">
+            <div style="background: #e0e0e0; border-radius: 10px; height: 10px;">
+                {% set repaid = loan.total_repaid if loan.total_repaid else 0 %}
+                {% set percent = (repaid / loan.total_payable_sats * 100) if loan.total_payable_sats > 0 else 0 %}
+                <div style="background: #27ae60; width: {{ percent }}%; height: 10px; border-radius: 10px;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                <small>Repaid: {{ "{:,}".format(repaid) }} sats</small>
+                <small>Remaining: {{ "{:,}".format(loan.total_payable_sats - repaid) }} sats</small>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+{% else %}
+    <div style="text-align: center; padding: 60px 20px; background: #f8f9fa; border-radius: 12px;">
+        <h3>📭 No Loans Yet</h3>
+        <p>You haven't requested any loans yet.</p>
+        <a href="/request_loan" class="btn btn-primary" style="margin-top: 15px;">Request Your First Loan →</a>
+    </div>
+{% endif %}
+
+<!-- Quick Stats -->
+{% if loans %}
+<div style="margin-top: 30px; background: #f8f9fa; padding: 20px; border-radius: 12px;">
+    <h3>📊 Loan Summary</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+        <div>
+            <strong>Total Borrowed:</strong><br>
+            <span style="font-size: 20px; color: #f7931a;">{{ "{:,}".format(loans|sum(attribute='amount_sats')) }} sats</span>
+        </div>
+        <div>
+            <strong>Active Loans:</strong><br>
+            <span style="font-size: 20px;">{{ loans|selectattr('status', 'in', ['funded', 'active'])|list|length }}</span>
+        </div>
+        <div>
+            <strong>Completed Loans:</strong><br>
+            <span style="font-size: 20px;">{{ loans|selectattr('status', 'equalto', 'repaid')|list|length }}</span>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

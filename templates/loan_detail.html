@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Loan #{{ loan.id }} Details</h2>
+
+<!-- Reputation Impact Card -->
+{% if risk_profile %}
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 8px; margin: 20px 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <div>
+            <strong>⭐ Your Reputation Impact</strong><br>
+            <small>On-time repayment will increase your score by +10 points</small>
+        </div>
+        <div>
+            <strong>Current Score:</strong> {{ risk_profile.risk_score }}/100
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Loan Details Card -->
+<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h3>📋 Loan Information</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
+        <div>
+            <p><strong>Purpose:</strong><br> {{ loan.purpose }}</p>
+        </div>
+        <div>
+            <p><strong>Principal:</strong><br> {{ "{:,}".format(loan.amount_sats) }} sats</p>
+        </div>
+        <div>
+            <p><strong>Interest ({{ loan.interest_rate }}%):</strong><br> {{ "{:,}".format(loan.interest_sats) }} sats</p>
+        </div>
+        <div>
+            <p><strong>Total to Repay:</strong><br> <span style="font-size: 20px; color: #f7931a;">{{ "{:,}".format(loan.total_payable_sats) }} sats</span></p>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Progress -->
+<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h3>💰 Payment Progress</h3>
+    {% set percent_repaid = (total_repaid / loan.total_payable_sats * 100) if loan.total_payable_sats > 0 else 0 %}
+    <div style="background: #e0e0e0; border-radius: 10px; height: 20px; margin: 10px 0;">
+        <div style="background: #27ae60; width: {{ percent_repaid }}%; height: 20px; border-radius: 10px;"></div>
+    </div>
+    <div style="display: flex; justify-content: space-between;">
+        <span>Repaid: {{ "{:,}".format(total_repaid) }} sats</span>
+        <span>Remaining: {{ "{:,}".format(remaining) }} sats</span>
+    </div>
+</div>
+
+<!-- Loan Status -->
+<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h3>📊 Status</h3>
+    <p><strong>Current Status:</strong> 
+        {% if loan.status == 'pending' %}
+            <span style="color: orange; font-size: 18px;">⏳ Pending Funding</span><br>
+            <small>Waiting for someone to fund your loan. Check back soon!</small>
+        {% elif loan.status == 'funded' %}
+            <span style="color: green; font-size: 18px;">✅ Funded</span><br>
+            <small>Your loan has been funded! You can now use the sats.</small>
+        {% elif loan.status == 'active' %}
+            <span style="color: #f39c12; font-size: 18px;">🔄 Active</span><br>
+            <small>Repayment in progress. Keep up the good work!</small>
+        {% elif loan.status == 'repaid' %}
+            <span style="color: blue; font-size: 18px;">🎉 Fully Repaid</span><br>
+            <small>Congratulations! Your reputation has increased.</small>
+        {% elif loan.status == 'overdue' %}
+            <span style="color: red; font-size: 18px;">⚠️ Overdue</span><br>
+            <small>Please make a payment to avoid reputation decrease.</small>
+        {% endif %}
+    </p>
+    <p><strong>Due Date:</strong> {{ loan.due_date }}</p>
+    <p><strong>Created:</strong> {{ loan.created_at }}</p>
+</div>
+
+<!-- Action Buttons (Borrower Only) -->
+<div style="margin: 20px 0; display: flex; gap: 15px; flex-wrap: wrap;">
+    {% if loan.status in ['funded', 'active', 'overdue'] %}
+        <a href="/repay/{{ loan.id }}" class="btn" style="background: #27ae60;">💰 Make Repayment</a>
+    {% endif %}
+    
+    {% if loan.status == 'pending' %}
+        <a href="/fund_loan/{{ loan.id }}" class="btn" style="background: #f39c12;">📥 Receive Funds (Get Invoice)</a>
+    {% endif %}
+    
+    <a href="/my_loans" class="btn" style="background: #95a5a6;">← Back to My Loans</a>
+</div>
+
+<!-- Repayment History -->
+{% if repayments %}
+<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h3>📜 Repayment History</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #e0e0e0;">
+                <th style="padding: 10px; text-align: left;">Date</th>
+                <th style="padding: 10px; text-align: left;">Amount</th>
+                <th style="padding: 10px; text-align: left;">Transaction</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for repayment in repayments %}
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 10px;">{{ repayment.date }}</td>
+                <td style="padding: 10px;">{{ "{:,}".format(repayment.amount_sats) }} sats</td>
+                <td style="padding: 10px;"><code style="font-size: 11px;">{{ repayment.transaction_hash[:16] }}...</code></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Tips Section -->
+<div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+    <h3>💡 Tips for Building Your Reputation</h3>
+    <ul style="margin: 10px 0 0 20px;">
+        <li>✅ Repay on time to increase your reputation score by +10 points</li>
+        <li>🏆 Complete 3 loans to unlock Bronze status and lower interest rates</li>
+        <li>📈 Higher reputation = Higher borrowing limits & Better rates</li>
+        <li>⚠️ Late payments will decrease your reputation score</li>
+    </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{
+  "paulakomuntale@gmail.com": {
+    "id": "paulakomuntale@gmail.com",
+    "name": "Komuntale Paula",
+    "email": "paulakomuntale@gmail.com",
+    "created_at": 1774551902,
+    "total_borrowed": 20000,
+    "total_repaid": 0,
+    "active_loans": 2,
+    "completed_loans": 0,
+    "reputation": 100
+  },
+  "paula@gmail.com": {
+    "id": "paula@gmail.com",
+    "name": "Komuntale Paula",
+    "email": "paula@gmail.com",
+    "created_at": 1774601612,
+    "total_borrowed": 0,
+    "total_repaid": 0,
+    "active_loans": 0,
+    "completed_loans": 0,
+    "reputation": 100
+  },
+  "s@s": {
+    "id": "s@s",
+    "name": "sss",
+    "email": "s@s",
+    "created_at": 1774605250,
+    "total_borrowed": 0,
+    "total_repaid": 0,
+    "active_loans": 0,
+    "completed_loans": 0,
+    "reputation": 100
+  }
+}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Request a Loan</h2>
+
+{% if error %}
+<div class="error">{{ error }}</div>
+{% endif %}
+
+<!-- Reputation as Collateral Info Card -->
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin: 20px 0;">
+    <h3>🏆 Your Collateral: Reputation</h3>
+    <p>{{ collateral_message }}</p>
+    {% if not is_first_loan %}
+    <div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; margin-top: 10px;">
+        <p><strong>Your Reputation Score:</strong> {{ risk_profile.risk_score }}/100</p>
+        <p><strong>Loans Completed:</strong> {{ risk_profile.total_loans_completed }}</p>
+        <p><strong>On-Time Payment Record:</strong> {{ "%.1f"|format(risk_profile.on_time_percentage) }}%</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Borrower Profile (NOT Lending Profile) -->
+{% if risk_profile %}
+<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+    <h3>👤 Your Borrower Profile</h3>
+    <p><strong>Status:</strong> {{ risk_profile.risk_level|title }} Borrower</p>
+    <p><strong>{{ risk_profile.description }}</strong></p>
+    <p><strong>Reputation Score:</strong> {{ risk_profile.risk_score }}/100</p>
+    <p><strong>Loans Completed:</strong> {{ risk_profile.total_loans_completed }}</p>
+    <p><strong>On-Time Payment Rate:</strong> {{ "%.1f"|format(risk_profile.on_time_percentage) }}%</p>
+    <p><strong>Your Borrowing Limit:</strong> {{ "{:,}".format(risk_profile.recommended_max_loan) }} sats</p>
+    <p><strong>Your Interest Rate:</strong> {{ risk_profile.interest_rate }}%</p>
+</div>
+{% endif %}
+
+<form method="POST" class="form">
+    <div class="form-group">
+        <label>Loan Amount (sats)</label>
+        <input type="number" name="amount" id="amount" min="{{ config.min_loan }}" max="{{ max_loan }}" required>
+        <small>Min: {{ "{:,}".format(config.min_loan) }} sats | Your Max: {{ "{:,}".format(max_loan) }} sats</small>
+    </div>
+    
+    <div class="form-group">
+        <label>Loan Period (days)</label>
+        <input type="number" name="days" id="days" min="{{ config.min_days }}" max="{{ config.max_days }}" required>
+        <small>Min: {{ config.min_days }} days | Max: {{ config.max_days }} days</small>
+    </div>
+    
+    <div class="form-group">
+        <label>Purpose</label>
+        <textarea name="purpose" rows="3" required placeholder="What will you use this loan for? (e.g., Business inventory, Equipment, Supplies)"></textarea>
+    </div>
+    
+    <div class="calculator" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+        <h3>Loan Summary</h3>
+        <p>Principal: <span id="principal">0</span> sats</p>
+        <p>Interest ({{ interest_rate }}%): <span id="interest">0</span> sats</p>
+        <p><strong>Total to repay: <span id="total">0</span> sats</strong></p>
+        {% if is_first_loan %}
+        <p style="color: #27ae60;">✨ First-time borrower! No collateral needed. Build your reputation with on-time payments!</p>
+        {% else %}
+        <p style="color: #f39c12;">🏆 Your reputation is your collateral! Keep it high for better rates and higher limits.</p>
+        {% endif %}
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Submit Request</button>
+</form>
+
+<script>
+const amountInput = document.querySelector('input[name="amount"]');
+const principalSpan = document.getElementById('principal');
+const interestSpan = document.getElementById('interest');
+const totalSpan = document.getElementById('total');
+
+const interestRate = {{ interest_rate }};
+
+function updateCalculator() {
+    const amount = parseInt(amountInput.value) || 0;
+    const interest = amount * interestRate / 100;
+    const total = amount + interest;
+    
+    principalSpan.textContent = amount.toLocaleString();
+    interestSpan.textContent = Math.round(interest).toLocaleString();
+    totalSpan.textContent = Math.round(total).toLocaleString();
+}
+
+amountInput.addEventListener('input', updateCalculator);
+document.querySelector('input[name="days"]').addEventListener('input', updateCalculator);
+updateCalculator();
+</script>
+{% endblock %}

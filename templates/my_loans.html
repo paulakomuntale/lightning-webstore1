@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Loans</h2>
+
+<h3>📝 Loans I've Borrowed</h3>
+{% if borrowed %}
+    {% for loan in borrowed %}
+    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+        <p><strong>Amount:</strong> {{ "{:,}".format(loan.amount_sats) }} sats</p>
+        <p><strong>Status:</strong> {{ loan.status }}</p>
+        <p><strong>Purpose:</strong> {{ loan.purpose }}</p>
+        <a href="/loan/{{ loan.id }}" class="btn">View Details</a>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No loans borrowed yet.</p>
+{% endif %}
+
+<h3>💰 Loans I've Lent</h3>
+{% if lent %}
+    {% for loan in lent %}
+    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+        <p><strong>To:</strong> {{ loan.borrower_name }}</p>
+        <p><strong>Amount:</strong> {{ "{:,}".format(loan.amount_sats) }} sats</p>
+        <p><strong>Status:</strong> {{ loan.status }}</p>
+        <a href="/loan/{{ loan.id }}" class="btn">View Details</a>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No loans lent yet.</p>
+{% endif %}
+{% endblock %}

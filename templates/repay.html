@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Repay Loan #{{ loan.id }}</h2>
+
+<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <p><strong>Total to repay:</strong> {{ "{:,}".format(loan.total_payable_sats) }} sats</p>
+    <p><strong>Already repaid:</strong> {{ "{:,}".format(total_repaid) }} sats</p>
+    <p><strong>Remaining:</strong> {{ "{:,}".format(remaining) }} sats</p>
+</div>
+
+<form method="POST">
+    <div class="form-group">
+        <label>Amount to repay (sats)</label>
+        <input type="number" name="amount" min="1000" max="{{ remaining }}" required>
+        <small>Min: 1000 sats | Max: {{ "{:,}".format(remaining) }} sats</small>
+    </div>
+    <button type="submit" class="btn btn-primary">Generate Payment Invoice</button>
+</form>
+{% endblock %}

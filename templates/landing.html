@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="text-align: center; padding: 60px 20px;">
+    <h1 style="font-size: 48px;">⚡ Lightning Borrow Platform</h1>
+    <p style="font-size: 20px; margin: 20px 0;">Borrow sats instantly using your reputation as collateral</p>
+    
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin: 40px auto; max-width: 500px;">
+        <h3>✨ Start Building Your Reputation</h3>
+        <p>Register to start borrowing with your reputation as collateral</p>
+        <a href="/register" class="btn" style="background: white; color: #667eea; margin-top: 15px; display: inline-block;">Get Started →</a>
+    </div>
+    
+    <div class="stats-section">
+        <h2>Platform Stats</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-top: 20px;">
+            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+                <div style="font-size: 32px; font-weight: bold; color: #f7931a;">{{ summary.total_loans if summary else 0 }}</div>
+                <div>Total Loans</div>
+            </div>
+            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+                <div style="font-size: 32px; font-weight: bold; color: #f7931a;">{{ "{:,}".format(summary.total_amount) if summary else 0 }}</div>
+                <div>Total Borrowed (sats)</div>
+            </div>
+            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+                <div style="font-size: 32px; font-weight: bold; color: #f7931a;">{{ summary.active if summary else 0 }}</div>
+                <div>Active Loans</div>
+            </div>
+            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+                <div style="font-size: 32px; font-weight: bold; color: #f7931a;">{{ summary.repaid if summary else 0 }}</div>
+                <div>Repaid Loans</div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <h3>🏆 Reputation is Collateral</h3>
+            <p>No funds locked. Your repayment history is your collateral.</p>
+        </div>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <h3>⚡ Instant Lightning</h3>
+            <p>Get funded instantly via Lightning Network payments.</p>
+        </div>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <h3>📈 Better Rates</h3>
+            <p>Higher reputation = Lower interest rates & Higher limits.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

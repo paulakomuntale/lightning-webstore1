@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Pay with Lightning</h2>
+<p>Amount: {{ "{:,}".format(amount) }} sats</p>
+<p>Purpose: {{ purpose }}</p>
+
+<div style="text-align: center; margin: 30px 0;">
+    <img src="data:image/png;base64,{{ invoice.qr_base64 }}" alt="QR Code" style="max-width: 300px;">
+</div>
+
+<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; word-break: break-all;">
+    <p><strong>Invoice:</strong></p>
+    <code>{{ invoice.payment_request }}</code>
+</div>
+
+<form action="/fund_loan" method="POST" id="payment-form">
+    <input type="hidden" name="r_hash" value="{{ invoice.r_hash }}">
+    <button type="submit" class="btn btn-primary" style="margin-top: 20px;">I Have Paid</button>
+</form>
+
+<script>
+// Auto-check payment every 3 seconds
+let checkCount = 0;
+const checkPayment = setInterval(() => {
+    fetch('/api/check_payment/{{ invoice.r_hash }}')
+        .then(r => r.json())
+        .then(data => {
+            if (data.settled) {
+                clearInterval(checkPayment);
+                document.getElementById('payment-form').submit();
+            }
+        });
+    checkCount++;
+    if (checkCount > 60) clearInterval(checkPayment);
+}, 3000);
+</script>
+{% endblock %}
